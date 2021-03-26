@@ -1,150 +1,77 @@
+# Homebridge Alarm Listener
 
-<p align="center">
+This plugin uses your computer's microphone to listen for standard smoke detector
+alarms, and publishes its findings as a HomeKit smoke sensor.
 
-<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
+If you're running Homebridge on a Raspberry Pi, plug in a cheap USB or I2S microphone to use this plugin.
 
-</p>
+## Use Cases
+
+- Together with HomeKit remote access (using a 
+HomePod, Apple TV, or iPad as a home hub) and sensor notifications, this plugin can help notify you of a smoke detector going off when you're away from home.
+
+- Using automations, turning on lights throughout the house whenever a smoke detector goes off at night.
+  
+- Triggering arbitrary Shortcuts 
+
+## Detection
+
+Intuitively, an alarm signal will appear as a single very prominent spike on the frequency spectrum for some extent of time.
+
+The plugin determines the presence or absence of an alarm signal based on the prominence of a particular range of frequencies above the rest of the spectrum, together with some smoothing to distinguish a real alarm signal from short alarm chirps or other false positives.
+
+This is implemented by periodically taking the Fourier transform of a set of microphone samples, calculating the average intensity of the target bins and the average intensity of the rest of the bins, and taking the ratio of the two. The ratio feeds an exponential smoothing model, which is then thresholded to produce a binary output.
 
 
-# Homebridge Platform Plugin Template
+## Configuration
 
-This is a template Homebridge platform plugin and can be used as a base to help you get started developing your own plugin.
+Add the following to the `platforms` section of `config.json`, or use the Homebridge UI settings dialog.
 
-This template should be used in conjunction with the [developer documentation](https://developers.homebridge.io/). A full list of all supported service types, and their characteristics is available on this site.
-
-## Clone As Template
-
-Click the link below to create a new GitHub Repository using this template, or click the *Use This Template* button above.
-
-<span align="center">
-
-### [Create New Repository From Template](https://github.com/homebridge/homebridge-plugin-template/generate)
-
-</span>
-
-## Setup Development Environment
-
-To develop Homebridge plugins you must have Node.js 12 or later installed, and a modern code editor such as [VS Code](https://code.visualstudio.com/). This plugin template uses [TypeScript](https://www.typescriptlang.org/) to make development easier and comes with pre-configured settings for [VS Code](https://code.visualstudio.com/) and ESLint. If you are using VS Code install these extensions:
-
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-
-## Install Development Dependencies
-
-Using a terminal, navigate to the project folder and run this command to install the development dependencies:
-
-```
-npm install
-```
-
-## Update package.json
-
-Open the [`package.json`](./package.json) and change the following attributes:
-
-* `name` - this should be prefixed with `homebridge-` or `@username/homebridge-` and contain no spaces or special characters apart from a dashes
-* `displayName` - this is the "nice" name displayed in the Homebridge UI
-* `repository.url` - Link to your GitHub repo
-* `bugs.url` - Link to your GitHub repo issues page
-
-When you are ready to publish the plugin you should set `private` to false, or remove the attribute entirely.
-
-## Update Plugin Defaults
-
-Open the [`src/settings.ts`](./src/settings.ts) file and change the default values:
-
-* `PLATFORM_NAME` - Set this to be the name of your platform. This is the name of the platform that users will use to register the plugin in the Homebridge `config.json`.
-* `PLUGIN_NAME` - Set this to be the same name you set in the [`package.json`](./package.json) file. 
-
-Open the [`config.schema.json`](./config.schema.json) file and change the following attribute:
-
-* `pluginAlias` - set this to match the `PLATFORM_NAME` you defined in the previous step.
-
-## Build Plugin
-
-TypeScript needs to be compiled into JavaScript before it can run. The following command will compile the contents of your [`src`](./src) directory and put the resulting code into the `dist` folder.
-
-```
-npm run build
+```json
+ {
+    "frequency": 3200,
+    "tolerance": 100,
+    "threshold": 1,
+    "inertia": 5,
+    "mic_device": "plughw:2,0",
+    "platform": "HomebridgeAlarmListener"
+}
 ```
 
-## Link To Homebridge
+- `frequency` is the center frequency of the alarm signal to detect. [Empirically](https://www.youtube.com/watch?v=bdVE3dvvBT0), 3200 Hz appears to be the most common siren frequency. 
+- `tolerance` specifies the width of the passband. The default value of 100 Hz means that bins from 3100 to 3300 Hz are considered.
+- `threshold` is the activation threshold value, which must be determined empirically (see `Tuning`)
+- `inertia` is the smoothing coefficient; higher values cause the system to be slower to respond but have less false positives. The default value should be good, but feel free to tweak it.
+- `mic_device` is the ALSA device name for the microphone you want to use; you most likely want to change this. You must use a `plughw`  device (to convert sample rates automatically, among other things)
+  - Run `arecord -L` to get a list of all recording devices on your system.
+  - https://superuser.com/questions/53957/what-do-alsa-devices-like-hw0-0-mean-how-do-i-figure-out-which-to-use
+  
+## Tuning Tips
 
-Run this command so your global install of Homebridge can discover the plugin in your development environment:
+The default values work with my First Alert smoke alarms and many other alarms in the video linked above, but here are some tips for increasing the sensitivity of the detector:
 
-```
-npm link
-```
+- Run `homebridge -D` to view the activation level of the detector in the log output. 
 
-You can now start Homebridge, use the `-D` flag so you can see debug log messages in your plugin:
+- Use a spectrum analyzer to determine the frequency of your alarm's siren. Set `frequency` and `tolerance` accordingly. If those are correctly set, the activation level should spike when the alarm goes off.
+  - A wider tolerance results in a less sensitive detector, but it can pick up a wider range of alarm frequencies. 
+  
+- Set `inertia` such that the activation level stays relatively constant until the alarm turns off. If you have a more intermittent alarm signal pattern, you might need higher inertia. 
 
-```
-homebridge -D
-```
+- Set `threshold` such that the activation level stays above it until the alarm turns off. This threshold depends on the loudness of the alarm and the proximity of the alarm to the microphone; a lower activation threshold means a fainter alarm can be detected but also increases the risk of false positives.
 
-## Watch For Changes and Build Automatically
+## Limitations
 
-If you want to have your code compile automatically as you make changes, and restart Homebridge automatically between changes you can run:
+- The detection algorithm is fairly naive and thus isn't a one-size-fits-all solution; some configuration is needed to tune the listener to your specific alarms (see `Configuration` below).
 
-```
-npm run watch
-```
+- Some smoke alarms have the same siren frequency as carbon monoxide alarms; the current version of the plugin does not differentiate between the two.
 
-This will launch an instance of Homebridge in debug mode which will restart every time you make a change to the source code. It will load the config stored in the default location under `~/.homebridge`. You may need to stop other running instances of Homebridge while using this command to prevent conflicts. You can adjust the Homebridge startup command in the [`nodemon.json`](./nodemon.json) file.
+- Some smoke alarms have a low-frequency siren -- usually 520 Hz. The low frequency square wave signal has very prominent harmonics and hence a multi-modal power spectrum; the detection algorithm assumes the alarm signal is unimodal, so it may not detect these kinds of alarms.
 
-## Customise Plugin
+- Can be spoofed with a sufficiently loud recording of the alarm. Don't do anything goofy like use it to unlock doors, etc.
 
-You can now start customising the plugin template to suit your requirements.
+## Disclaimer
 
-* [`src/platform.ts`](./src/platform.ts) - this is where your device setup and discovery should go.
-* [`src/platformAccessory.ts`](./src/platformAccessory.ts) - this is where your accessory control logic should go, you can rename or create multiple instances of this file for each accessory type you need to implement as part of your platform plugin. You can refer to the [developer documentation](https://developers.homebridge.io/) to see what characteristics you need to implement for each service type.
-* [`config.schema.json`](./config.schema.json) - update the config schema to match the config you expect from the user. See the [Plugin Config Schema Documentation](https://developers.homebridge.io/#/config-schema).
+This is a hobby project, and is not intended to be used as a in any critical systems. This software comes without any guarantees of any kind, so don't come after me if it malfunctions and bad things happen. 
 
-## Versioning Your Plugin
-
-Given a version number `MAJOR`.`MINOR`.`PATCH`, such as `1.4.3`, increment the:
-
-1. **MAJOR** version when you make breaking changes to your plugin,
-2. **MINOR** version when you add functionality in a backwards compatible manner, and
-3. **PATCH** version when you make backwards compatible bug fixes.
-
-You can use the `npm version` command to help you with this:
-
-```bash
-# major update / breaking changes
-npm version major
-
-# minor update / new features
-npm version update
-
-# patch / bugfixes
-npm version patch
-```
-
-## Publish Package
-
-When you are ready to publish your plugin to [npm](https://www.npmjs.com/), make sure you have removed the `private` attribute from the [`package.json`](./package.json) file then run:
-
-```
-npm publish
-```
-
-If you are publishing a scoped plugin, i.e. `@username/homebridge-xxx` you will need to add `--access=public` to command the first time you publish.
-
-#### Publishing Beta Versions
-
-You can publish *beta* versions of your plugin for other users to test before you release it to everyone.
-
-```bash
-# create a new pre-release version (eg. 2.1.0-beta.1)
-npm version prepatch --preid beta
-
-# publsh to @beta
-npm publish --tag=beta
-```
-
-Users can then install the  *beta* version by appending `@beta` to the install command, for example:
-
-```
-sudo npm install -g homebridge-example-plugin@beta
-```
 
 

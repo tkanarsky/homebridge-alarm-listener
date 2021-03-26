@@ -1,5 +1,4 @@
 {
-  "private": true,
   "displayName": "Homebridge Alarm Listener",
   "name": "homebridge-alarm-listener",
   "version": "1.0.0",
