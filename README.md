@@ -71,7 +71,7 @@ The default values work with my First Alert smoke alarms and many other alarms i
 
 ## Disclaimer
 
-This is a hobby project, and is not intended to be used as a in any critical systems. This software comes without any guarantees of any kind, so don't come after me if it malfunctions and bad things happen. 
+This is a hobby project, and is not intended to be used in any life-critical systems. This software comes without any guarantees of any kind, so don't come after me if it malfunctions and bad things happen. 
 
 
 
