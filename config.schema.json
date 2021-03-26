@@ -21,7 +21,19 @@
         "title": "Threshold",
         "type": "integer",
         "required": true,
-        "default": 5
+        "default": 1
+      },
+      "inertia": {
+        "title": "Activation Inertia",
+        "type": "integer",
+        "required": true,
+        "default": 10
+      },
+      "mic_device": {
+        "title": "Microphone Device",
+        "type": "string",
+        "required": true,
+        "default": "plughw:2,0"
       }
     }
   }
