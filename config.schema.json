@@ -1,15 +1,27 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
+  "pluginAlias": "HomebridgeAlarmListener",
   "pluginType": "platform",
   "singular": true,
   "schema": {
     "type": "object",
     "properties": {
-      "name": {
-        "title": "Name",
-        "type": "string",
+      "frequency": {
+        "title": "Alarm Frequency",
+        "type": "integer",
         "required": true,
-        "default": "Example Dynamic Platform"
+        "default": 3200
+      },
+      "tolerance": {
+        "title": "Passband",
+        "type": "integer",
+        "required": true,
+        "default": 100
+      },
+      "threshold": {
+        "title": "Threshold",
+        "type": "integer",
+        "required": true,
+        "default": 5
       }
     }
   }

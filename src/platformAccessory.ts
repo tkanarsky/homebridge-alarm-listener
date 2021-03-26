@@ -1,6 +1,6 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-
 import { ExampleHomebridgePlatform } from './platform';
+import { Detector } from './worker';
 
 /**
  * Platform Accessory
@@ -18,11 +18,21 @@ export class ExamplePlatformAccessory {
     On: false,
     Brightness: 100,
   };
+  private detector: Detector;
 
   constructor(
     private readonly platform: ExampleHomebridgePlatform,
     private readonly accessory: PlatformAccessory,
   ) {
+
+    this.detector = new Detector(
+      platform,
+      'plughw:2,0',
+      3150,
+      50,
+      10,
+      5
+    );
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!

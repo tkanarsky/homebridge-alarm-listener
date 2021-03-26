@@ -1,16 +1,16 @@
 {
   "private": true,
-  "displayName": "Plugin Name",
-  "name": "homebridge-plugin-name",
+  "displayName": "Homebridge Alarm Listener",
+  "name": "homebridge-alarm-listener",
   "version": "1.0.0",
-  "description": "A short description about what your plugin does.",
+  "description": "Listens for smoke alarms, and publishes a Smoke Sensor service.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/USERNAME/GITHUB_PROJECT_NAME.git"
+    "url": "git://github.com/tkanarsky/homebridge-alarm-listener.git"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME/issues"
+    "url": "https://github.com/tkanarsky/homebridge-alarm-listener/issues"
   },
   "engines": {
     "node": ">=10.17.0",
@@ -26,7 +26,10 @@
   "keywords": [
     "homebridge-plugin"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "mic": "^2.1.2",
+    "numjs": "nicolaspanel/numjs"
+  },
   "devDependencies": {
     "@types/node": "^14.14.31",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
