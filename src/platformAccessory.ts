@@ -13,11 +13,14 @@ export class AlarmListenerAccessory {
 
     this.detector = new Detector(this.platform);
 
-    this.accessory.getService(this.platform.Service.AccessoryInformation)!
+    const accessoryService = this.accessory.getService(this.platform.Service.AccessoryInformation);
+    if (accessoryService) {
+      accessoryService
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Homebridge')
       .setCharacteristic(this.platform.Characteristic.Model, 'Alarm Listener')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, 'SN01');
-
+    }
+     
     this.service = this.accessory.getService(this.platform.Service.SmokeSensor) || this.accessory.addService(this.platform.Service.SmokeSensor);
 
     this.service.setCharacteristic(this.platform.Characteristic.Name, 'Alarm Listener');

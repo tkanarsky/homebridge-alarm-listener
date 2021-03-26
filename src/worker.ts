@@ -26,7 +26,7 @@ export class Detector {
         mic_stream.on('data', data => this.process(data));
     }
 
-    process(data: Buffer) {
+    process(data: Buffer): void {
         const data_array = numjs.array([...data]);
         const fft_array = numjs.stack([data_array, numjs.zeros(data_array.shape)], -1);
         const bins_complex = numjs.fft(fft_array);
@@ -52,11 +52,11 @@ export class Detector {
         }
     }
 
-    activated() {
+    activated(): boolean {
         return this.activation >= this.platform.config.threshold;
     }
 
-    getActivation() {
+    getActivation(): number {
         return this.activation;
     }
 }

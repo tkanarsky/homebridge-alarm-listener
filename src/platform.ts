@@ -1,7 +1,6 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { AlarmListenerAccessory } from './platformAccessory';
-import { access } from 'node:fs';
 
 export class AlarmListenerPlatform implements DynamicPlatformPlugin {
   
@@ -27,7 +26,7 @@ export class AlarmListenerPlatform implements DynamicPlatformPlugin {
    * This function is invoked when homebridge restores cached accessories from disk at startup.
    * It should be used to setup event handlers for characteristics and update respective values.
    */
-  configureAccessory(accessory: PlatformAccessory) {
+  configureAccessory(accessory: PlatformAccessory): void {
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
   }
@@ -37,7 +36,7 @@ export class AlarmListenerPlatform implements DynamicPlatformPlugin {
    * Accessories must only be registered once, previously created accessories
    * must not be registered again to prevent "duplicate UUID" errors.
    */
-  initAlarmListener() {
+  initAlarmListener(): void {
 
     const uuid = this.api.hap.uuid.generate('AlarmListener');
     const listener = this.accessories.find(accessory => accessory.UUID === uuid);
