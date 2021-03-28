@@ -25,19 +25,20 @@ This is implemented by periodically taking the Fourier transform of a set of mic
 
 ## Configuration
 
-Add the following to the `platforms` section of `config.json`, or use the Homebridge UI settings dialog.
+Add the following to the `accessories` section of `config.json`, or use the Homebridge UI settings dialog.
 
 ```json
- {
-    "frequency": 3200,
-    "tolerance": 100,
-    "threshold": 1,
-    "inertia": 5,
-    "mic_device": "plughw:2,0",
-    "platform": "HomebridgeAlarmListener"
+{
+  "name": "Alarm Listener",
+  "frequency": 3200,
+  "tolerance": 100,
+  "threshold": 1,
+  "inertia": 10,
+  "mic_device": "plughw:2,0",
+  "accessory": "HomebridgeAlarmListener"
 }
 ```
-
+- `name` is the name of the accessory that this plugin will spawn.
 - `frequency` is the center frequency of the alarm signal to detect. [Empirically](https://www.youtube.com/watch?v=bdVE3dvvBT0), 3200 Hz appears to be the most common siren frequency. 
 - `tolerance` specifies the width of the passband. The default value of 100 Hz means that bins from 3100 to 3300 Hz are considered.
 - `threshold` is the activation threshold value, which must be determined empirically (see `Tuning`)
@@ -61,7 +62,7 @@ The default values work with my First Alert smoke alarms and many other alarms i
 
 ## Limitations
 
-- The detection algorithm is fairly naive and thus isn't a one-size-fits-all solution; some configuration is needed to tune the listener to your specific alarms (see `Configuration` below).
+- The detection algorithm is fairly naive and thus isn't a one-size-fits-all solution; some configuration is needed to tune the listener to your specific alarms (see `Configuration` above).
 
 - Some smoke alarms have the same siren frequency as carbon monoxide alarms; the current version of the plugin does not differentiate between the two.
 
@@ -74,4 +75,6 @@ The default values work with my First Alert smoke alarms and many other alarms i
 This is a hobby project, and is not intended to be used in any life-critical systems. This software comes without any guarantees of any kind, so don't come after me if it malfunctions and bad things happen. 
 
 
+## Changelog
 
+v2.0.0 -- moved from platform plugin to accessory plugin; added Status Active monitoring

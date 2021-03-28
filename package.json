@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Alarm Listener",
   "name": "homebridge-alarm-listener",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Listens for smoke alarms, and publishes a Smoke Sensor service.",
   "license": "Apache-2.0",
   "repository": {
@@ -23,7 +23,11 @@
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "alarm",
+    "fft",
+    "homekit",
+    "smoke-alarm"
   ],
   "dependencies": {
     "mic": "^2.1.2",
