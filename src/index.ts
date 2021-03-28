@@ -1,4 +1,4 @@
-import { Service, CharacteristicValue, Logger, AccessoryConfig, API, Characteristic } from 'homebridge';
+import { Service, CharacteristicValue, Logger, AccessoryConfig, API } from 'homebridge';
 import { Detector } from './worker';
 
 class AlarmListenerAccessory {
