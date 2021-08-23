@@ -76,15 +76,15 @@ The default values work with my First Alert smoke alarms and many other alarms i
 
 If you're having trouble getting your microphone device to detect in your linux environment, eg:
 
-```shell
-$ sudo aplay -l  
+```bash
+$ sudo arecord -l  
 aplay: device_list:240: no soundcards found...
 ```
 
 Ensure that you [add your `homebridge` user to the `audio` group](https://askubuntu.com/questions/57810/how-to-fix-no-soundcards-found).
 
 ```shell
-sudo adduser homebridge audio
+$ sudo adduser homebridge audio
 ```
 
 
