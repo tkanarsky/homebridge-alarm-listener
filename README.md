@@ -70,6 +70,24 @@ The default values work with my First Alert smoke alarms and many other alarms i
 
 - Can be spoofed with a sufficiently loud recording of the alarm. Don't do anything goofy like use it to unlock doors, etc.
 
+## FAQs
+
+### Add user to `sound` group
+
+If you're having trouble getting your microphone device to detect in your linux environment, eg:
+
+```shell
+$ sudo aplay -l  
+aplay: device_list:240: no soundcards found...
+```
+
+Ensure that you [add your `homebridge` user to the `audio` group](https://askubuntu.com/questions/57810/how-to-fix-no-soundcards-found).
+
+```shell
+sudo adduser homebridge audio
+```
+
+
 ## Disclaimer
 
 This is a hobby project, and is not intended to be used in any life-critical systems. This software comes without any guarantees of any kind, so don't come after me if it malfunctions and bad things happen. 
