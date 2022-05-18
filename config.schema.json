@@ -5,6 +5,13 @@
   "schema": {
     "type": "object",
     "properties": {
+      "name": {
+        "title": "Listener Name",
+        "type": "string",
+        "default": "Smoke Alarm",
+        "minLength": 1,
+        "required": true
+      },
       "frequency": {
         "title": "Alarm Frequency",
         "type": "integer",
